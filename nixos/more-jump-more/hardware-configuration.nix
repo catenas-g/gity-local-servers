@@ -9,5 +9,14 @@
 
   hardware.enableRedistributableFirmware = true;
 
-  nixpkgs.hostPlatform = "aarch64-linux";
+  # Cross-compilation: build on x86_64, target aarch64
+  nixpkgs.buildPlatform.system = "x86_64-linux";
+  nixpkgs.hostPlatform.system = "aarch64-linux";
+
+  # Allow missing kernel modules (e.g. dw-hdmi renamed in newer kernels)
+  nixpkgs.overlays = [
+    (_final: prev: {
+      makeModulesClosure = args: prev.makeModulesClosure (args // { allowMissing = true; });
+    })
+  ];
 }

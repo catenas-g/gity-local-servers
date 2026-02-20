@@ -6,7 +6,7 @@
     # Custom build with L4 (layer 4) plugin for TCP/UDP proxying
     package = pkgs.caddy.withPlugins {
       plugins = [ "github.com/mholt/caddy-l4@v0.0.0-20260216070754-eca560d759c9" ];
-      hash = ""; # TODO: Build once, Nix will report the correct hash
+      hash = "sha256-HhI0s8bi+T89dz0V0yfrTU/1NTK5wJUtxxn7Sg9Fi9g=";
     };
   };
 

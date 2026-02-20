@@ -1,5 +1,5 @@
 # NixOS configuration for more-jump-more (Raspberry Pi 4 jump server)
-{ outputs, ... }:
+{ outputs, pkgs, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -114,11 +114,15 @@
   users.users.gity = {
     isNormalUser = true;
     extraGroups = [ "wheel" ];
+    initialPassword = "password";
+    shell = pkgs.fish;
     openssh.authorizedKeys.keys = [
       # TODO: Add your SSH public key
       # "ssh-ed25519 AAAA... user@host"
     ];
   };
+
+  programs.fish.enable = true;
 
   security.sudo.wheelNeedsPassword = false;
 
