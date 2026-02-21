@@ -3,12 +3,14 @@
   inputs,
   outputs,
   pkgs,
+  modulesPath,
   ...
 }:
 {
   imports = [
     ./hardware-configuration.nix
     ../../modules/common/nixpkgs.nix
+    "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
   ]
   ++ (with outputs.modules.nixos; [
     headscale
