@@ -93,27 +93,16 @@
   # --- Networking ---
   networking = {
     hostName = "more-jump-more";
-
-    interfaces.end0 = {
-      useDHCP = false;
-      ipv4.addresses = [
-        {
-          address = "192.168.1.10"; # TODO: Replace with your LAN IP
-          prefixLength = 24;
-        }
-      ];
-    };
-    defaultGateway = "192.168.1.1"; # TODO: Replace
-    nameservers = [
-      "1.1.1.1"
-      "1.0.0.1"
-    ];
+    networkmanager.enable = true;
   };
 
   # --- User ---
   users.users.gity = {
     isNormalUser = true;
-    extraGroups = [ "wheel" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+    ];
     initialPassword = "password";
     shell = pkgs.fish;
     openssh.authorizedKeys.keys = [
@@ -123,6 +112,16 @@
   };
 
   programs.fish.enable = true;
+
+  # --- Home Manager ---
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    users.gity = {
+      programs.git.enable = true;
+      home.stateVersion = "25.11";
+    };
+  };
 
   security.sudo.wheelNeedsPassword = false;
 
