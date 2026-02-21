@@ -100,7 +100,23 @@
   # --- Networking ---
   networking = {
     hostName = "more-jump-more";
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+      ensureProfiles.profiles.static-end0 = {
+        connection = {
+          id = "static-end0";
+          type = "ethernet";
+          interface-name = "end0";
+          autoconnect = "true";
+        };
+        ipv4 = {
+          method = "manual";
+          addresses = "192.168.128.200/24";
+          gateway = "192.168.128.1";
+          dns = "192.168.128.1";
+        };
+      };
+    };
   };
 
   # --- User ---
