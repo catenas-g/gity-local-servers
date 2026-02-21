@@ -13,10 +13,10 @@ let
     };
 in
 {
-  "panoption-chan" = mkHomeConfig {
+  "gity" = mkHomeConfig {
     system = "x86_64-linux";
     modules = [
-      ./panoption-chan
+      ./gity
     ];
   };
 }

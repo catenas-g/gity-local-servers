@@ -1,5 +1,10 @@
 # NixOS configuration for more-jump-more (Raspberry Pi 4 jump server)
-{ outputs, pkgs, ... }:
+{
+  inputs,
+  outputs,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ./hardware-configuration.nix
@@ -115,12 +120,8 @@
 
   # --- Home Manager ---
   home-manager = {
-    useGlobalPkgs = true;
-    useUserPackages = true;
-    users.gity = {
-      programs.git.enable = true;
-      home.stateVersion = "25.11";
-    };
+    extraSpecialArgs = { inherit inputs outputs; };
+    users.gity = import ../../home-manager/gity;
   };
 
   security.sudo.wheelNeedsPassword = false;
