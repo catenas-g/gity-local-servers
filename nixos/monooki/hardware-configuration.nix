@@ -29,7 +29,12 @@
   fileSystems."/" = {
     device = "/dev/disk/by-uuid/66f18aff-a721-47b7-a5d5-a8156facecab";
     fsType = "btrfs";
-    options = [ "subvol=@" ];
+    options = [
+      "subvol=@"
+      "compress=zstd"
+      "noatime"
+      "space_cache=v2"
+    ];
   };
 
   fileSystems."/boot" = {
@@ -44,7 +49,12 @@
   fileSystems."/home" = {
     device = "/dev/disk/by-uuid/66f18aff-a721-47b7-a5d5-a8156facecab";
     fsType = "btrfs";
-    options = [ "subvol=@home" ];
+    options = [
+      "subvol=@home"
+      "compress=zstd"
+      "noatime"
+      "space_cache=v2"
+    ];
   };
 
   swapDevices = [ ];

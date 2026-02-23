@@ -16,6 +16,7 @@
   ]);
 
   # --- Boot ---
+  boot.initrd.supportedFilesystems = [ "btrfs" ];
   boot.loader = {
     grub = {
       enable = true;
@@ -59,6 +60,18 @@
 
     maxUploadSize = "16G";
   };
+
+  # --- Btrfs RAID1 ---
+  services.btrfs.autoScrub = {
+    enable = true;
+    interval = "monthly";
+    fileSystems = [ "/" ];
+  };
+
+  environment.systemPackages = with pkgs; [
+    btrfs-progs
+    compsize
+  ];
 
   # --- Networking ---
   networking = {
