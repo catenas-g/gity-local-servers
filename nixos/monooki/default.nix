@@ -59,6 +59,8 @@
         "192.168.128.199"
       ];
       overwriteprotocol = "http";
+      loglevel = 0;
+      log_type = "file";
     };
 
     maxUploadSize = "16G";
