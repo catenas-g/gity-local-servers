@@ -111,8 +111,7 @@
     initialPassword = "password";
     shell = pkgs.fish;
     openssh.authorizedKeys.keys = [
-      # TODO: Add your SSH public key
-      # "ssh-ed25519 AAAA... user@host"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBsUNCEGNnXLxDlutnbifeorEfa9ESJKvyupLc+nigaX hayao@XPS9350"
     ];
   };
 
