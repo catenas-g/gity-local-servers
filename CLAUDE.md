@@ -22,10 +22,10 @@ AI assistant guidance for Gity Local Servers Nix repository.
 
 ## Essential Rules
 
-1. **ALWAYS format with nix fmt** before committing or after any file change:
+1. **ALWAYS format with treefmt** before committing or after any file change:
 
    ```bash
-   nix fmt
+   treefmt
    ```
 
 2. **ALWAYS validate** after any `.nix` file change:
@@ -36,7 +36,7 @@ AI assistant guidance for Gity Local Servers Nix repository.
 
 3. **Repository**: Nix Flakes for NixOS and Home Manager
 4. **Platforms**: NixOS (aarch64-linux, x86_64-linux)
-5. **Main configs**: `more-jump-more` (NixOS/aarch64), `panoption-chan` (Home Manager)
+5. **Main configs**: `more-jump-more` (NixOS/aarch64), `monooki` (NixOS/x86_64), `panoption-chan` (Home Manager)
 6. **Modules**: headscale, caddy-l4, tailscale, cloudflare-ddns, ssh-server
 
 ## Auto-Update Policy

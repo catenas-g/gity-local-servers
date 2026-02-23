@@ -11,6 +11,11 @@
     };
 
     nixos-hardware.url = "github:NixOS/nixos-hardware/master";
+
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -31,9 +36,13 @@
           }) systems
         );
     in
+    let
+      treefmtEval =
+        system: inputs.treefmt-nix.lib.evalModule (import inputs.nixpkgs { inherit system; }) ./treefmt.nix;
+    in
     {
-      # Formatter for nix files, available through 'nix fmt'
-      formatter = forAllSystems (system: (import inputs.nixpkgs { inherit system; }).nixfmt-rfc-style);
+      # Formatter available through 'nix fmt'
+      formatter = forAllSystems (system: (treefmtEval system).config.build.wrapper);
 
       # Overlays
       overlays = import ./overlays { inherit inputs; };

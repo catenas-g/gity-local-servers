@@ -1,13 +1,24 @@
 # Validation Guide
 
 ## Quick Check
+
 ```bash
 nix flake check --extra-experimental-features 'nix-command flakes'
 ```
 
+## Format
+
+```bash
+treefmt
+```
+
 ## Full Validation Script
+
 ```bash
 #!/bin/bash
+# Format
+treefmt || exit 1
+
 # Check syntax
 nix flake check --extra-experimental-features 'nix-command flakes' --show-trace || exit 1
 
@@ -29,6 +40,7 @@ done
 ```
 
 ## When to Run
+
 - After any .nix file edit
 - Before commits
 - After adding packages/modules

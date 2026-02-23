@@ -11,9 +11,19 @@
     ../../modules/common/nixpkgs.nix
   ]
   ++ (with outputs.modules.nixos; [
-    tailscale
+    # tailscale
     ssh-server
   ]);
+
+  # --- Boot ---
+  boot.loader = {
+    grub = {
+      enable = true;
+      efiSupport = true;
+      device = "nodev";
+    };
+    efi.canTouchEfiVariables = true;
+  };
 
   # --- NextCloud ---
   services.nextcloud = {
@@ -43,7 +53,23 @@
   # --- Networking ---
   networking = {
     hostName = "monooki";
-    networkmanager.enable = true;
+    networkmanager = {
+      enable = true;
+      ensureProfiles.profiles.static-ens2s0 = {
+        connection = {
+          id = "static-ens2s0";
+          type = "ethernet";
+          interface-name = "ens2s0";
+          autoconnect = "true";
+        };
+        ipv4 = {
+          method = "manual";
+          addresses = "192.168.128.199/24";
+          gateway = "192.168.128.1";
+          dns = "192.168.128.1";
+        };
+      };
+    };
     firewall.allowedTCPPorts = [
       80 # HTTP (nginx for NextCloud)
     ];
