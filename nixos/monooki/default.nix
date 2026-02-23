@@ -81,11 +81,11 @@
     hostName = "monooki";
     networkmanager = {
       enable = true;
-      ensureProfiles.profiles.static-ens2s0 = {
+      ensureProfiles.profiles.static-enp2s0 = {
         connection = {
-          id = "static-ens2s0";
+          id = "static-enp2s0";
           type = "ethernet";
-          interface-name = "ens2s0";
+          interface-name = "enp2s0";
           autoconnect = "true";
         };
         ipv4 = {
