@@ -26,6 +26,15 @@
   };
 
   # --- NextCloud ---
+  # Ensure admin password file exists before nextcloud-setup runs
+  system.activationScripts.nextcloud-admin-pass = ''
+    mkdir -p /var/lib/secrets
+    if [ ! -f /var/lib/secrets/nextcloud-admin-pass ]; then
+      ${pkgs.openssl}/bin/openssl rand -base64 32 > /var/lib/secrets/nextcloud-admin-pass
+    fi
+    chmod 600 /var/lib/secrets/nextcloud-admin-pass
+  '';
+
   services.nextcloud = {
     enable = true;
     hostName = "cloud.example.com"; # TODO: Replace with your domain
