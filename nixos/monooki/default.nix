@@ -30,7 +30,7 @@
     enable = true;
     hostName = "cloud.example.com"; # TODO: Replace with your domain
     package = pkgs.nextcloud31;
-    https = true; # Behind Caddy reverse proxy on more-jump-more
+    https = true;
 
     configureRedis = true;
     database.createLocally = true;
@@ -41,9 +41,10 @@
     };
 
     settings = {
-      trusted_proxies = [
-        "100.64.0.0/10" # Tailscale/Headscale network
-      ];
+      # Headscale は現在使用停止中
+      # trusted_proxies = [
+      #   "100.64.0.0/10" # Tailscale/Headscale network
+      # ];
       overwriteprotocol = "https";
     };
 
