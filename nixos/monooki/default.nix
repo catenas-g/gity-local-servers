@@ -55,6 +55,9 @@
       # trusted_proxies = [
       #   "100.64.0.0/10" # Tailscale/Headscale network
       # ];
+      trusted_domains = [
+        "192.168.128.199"
+      ];
       overwriteprotocol = "https";
     };
 
