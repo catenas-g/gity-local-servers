@@ -40,7 +40,7 @@
     enable = true;
     hostName = "cloud.example.com"; # TODO: Replace with your domain
     package = pkgs.nextcloud31;
-    https = true;
+    https = false;
 
     configureRedis = true;
     database.createLocally = true;
@@ -58,7 +58,7 @@
       trusted_domains = [
         "192.168.128.199"
       ];
-      overwriteprotocol = "https";
+      overwriteprotocol = "http";
     };
 
     maxUploadSize = "16G";
