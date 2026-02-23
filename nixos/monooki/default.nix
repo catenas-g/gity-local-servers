@@ -62,6 +62,11 @@
     };
 
     maxUploadSize = "16G";
+
+    phpOptions = {
+      "session.cookie_samesite" = "Lax";
+      "session.cookie_secure" = "false";
+    };
   };
 
   # --- Btrfs RAID1 ---
