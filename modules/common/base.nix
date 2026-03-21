@@ -43,10 +43,16 @@
   security.sudo.wheelNeedsPassword = false;
 
   # --- Nix ---
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
+  nix.settings = {
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+    trusted-users = [
+      "root"
+      "@wheel"
+    ];
+  };
 
   # --- Locale ---
   time.timeZone = "Asia/Tokyo";
