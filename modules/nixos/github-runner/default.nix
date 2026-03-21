@@ -9,6 +9,7 @@
     extraLabels = [
       "nixos"
       "nix"
+      config.networking.hostName
     ];
     extraPackages = with pkgs; [
       nix
