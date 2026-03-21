@@ -5,7 +5,7 @@ services:
     environment:
       RUNNER_SCOPE: org
       ORG_NAME: catenas-g
-      LABELS: self-hosted,ubuntu,nix
+      LABELS: self-hosted,ubuntu
       RUNNER_NAME_PREFIX: docker-runner
       EPHEMERAL: "true"
       START_DOCKER_SERVICE: "true"
