@@ -9,6 +9,7 @@
   imports = [
     ./hardware-configuration.nix
     ../../modules/common/nixpkgs.nix
+    ../../modules/common/base.nix
   ]
   ++ (with outputs.modules.nixos; [
     # tailscale
@@ -82,21 +83,18 @@
   # --- Networking ---
   networking = {
     hostName = "monooki";
-    networkmanager = {
-      enable = true;
-      ensureProfiles.profiles.static-enp2s0 = {
-        connection = {
-          id = "static-enp2s0";
-          type = "ethernet";
-          interface-name = "enp2s0";
-          autoconnect = "true";
-        };
-        ipv4 = {
-          method = "manual";
-          addresses = "192.168.128.199/24";
-          gateway = "192.168.128.1";
-          dns = "192.168.128.1";
-        };
+    networkmanager.ensureProfiles.profiles.static-enp2s0 = {
+      connection = {
+        id = "static-enp2s0";
+        type = "ethernet";
+        interface-name = "enp2s0";
+        autoconnect = "true";
+      };
+      ipv4 = {
+        method = "manual";
+        addresses = "192.168.128.199/24";
+        gateway = "192.168.128.1";
+        dns = "192.168.128.1";
       };
     };
     firewall.allowedTCPPorts = [
@@ -104,38 +102,8 @@
     ];
   };
 
-  # --- User ---
-  users.users.gity = {
-    isNormalUser = true;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-    ];
-    initialPassword = "password";
-    shell = pkgs.fish;
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBsUNCEGNnXLxDlutnbifeorEfa9ESJKvyupLc+nigaX hayao@XPS9350"
-    ];
-  };
-
-  programs.fish.enable = true;
-
-  # --- Home Manager ---
-  home-manager = {
-    extraSpecialArgs = { inherit inputs outputs; };
-    users.gity = import ../../home-manager/gity;
-  };
-
-  security.sudo.wheelNeedsPassword = false;
-
-  # --- Nix ---
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
+  # --- User (SSH keys) ---
+  users.users.gity.openssh.authorizedKeys.keys = [
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBsUNCEGNnXLxDlutnbifeorEfa9ESJKvyupLc+nigaX hayao@XPS9350"
   ];
-
-  # --- Locale ---
-  time.timeZone = "Asia/Tokyo";
-
-  system.stateVersion = "25.11";
 }
