@@ -31,7 +31,6 @@ in
           extraLabels = [
             "self-hosted"
             "nixos"
-            "nix"
             hostname
           ];
           extraPackages = with pkgs; [
