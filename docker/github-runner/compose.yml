@@ -1,6 +1,6 @@
 services:
   runner:
-    image: myoung34/github-runner:latest
+    build: .
     restart: unless-stopped
     environment:
       RUNNER_SCOPE: org
