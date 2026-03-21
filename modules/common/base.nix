@@ -6,6 +6,9 @@
   ...
 }:
 {
+  imports = with outputs.modules.nixos; [
+    attic-watch
+  ];
   # --- Firewall logging ---
   networking.firewall = {
     logRefusedConnections = false;
@@ -51,6 +54,14 @@
     trusted-users = [
       "root"
       "@wheel"
+    ];
+    substituters = [
+      "https://cache.nixos.org"
+      "http://192.168.128.199:8080/gity"
+    ];
+    trusted-public-keys = [
+      "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
+      "gity:XeiT0KGhWFIQM9GxOGSa60X8axF0cSJBd92/DaIbXXY="
     ];
   };
 
