@@ -15,6 +15,7 @@
     # tailscale
     ssh-server
     attic
+    github-runner
   ]);
 
   # --- Boot ---
