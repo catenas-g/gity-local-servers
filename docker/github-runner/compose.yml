@@ -1,0 +1,22 @@
+services:
+  runner:
+    image: myoung34/github-runner:latest
+    restart: unless-stopped
+    environment:
+      RUNNER_SCOPE: org
+      ORG_NAME: catenas-g
+      LABELS: self-hosted,ubuntu,nix
+      RUNNER_NAME_PREFIX: docker-runner
+      EPHEMERAL: "true"
+      START_DOCKER_SERVICE: "true"
+      RUNNER_WORKDIR: /tmp/github-runner
+    env_file:
+      - .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - runner-work:/tmp/github-runner
+    deploy:
+      replicas: 4
+
+volumes:
+  runner-work:
