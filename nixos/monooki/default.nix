@@ -18,6 +18,9 @@
     github-runner
   ]);
 
+  # --- GitHub Actions Runner ---
+  custom.github-runner.count = 4;
+
   # --- Boot ---
   boot.initrd.supportedFilesystems = [ "btrfs" ];
   boot.loader = {
