@@ -50,11 +50,12 @@
       # Modules
       modules = import ./modules;
 
-      # SD card images (cross-compiled from x86_64-linux)
-      packages.x86_64-linux = {
-        sdImage = self.nixosConfigurations.more-jump-more.config.system.build.sdImage;
-        sdImage-errand-ensemble = self.nixosConfigurations.errand-ensemble.config.system.build.sdImage;
-      };
+      # SD card images
+      packages = forAllSystems (_system: {
+        more-jump-more-sdImage = self.nixosConfigurations.more-jump-more.config.system.build.sdImage;
+        errand-ensemble-1-sdImage = self.nixosConfigurations.errand-ensemble-1.config.system.build.sdImage;
+        errand-ensemble-2-sdImage = self.nixosConfigurations.errand-ensemble-2.config.system.build.sdImage;
+      });
 
       # NixOS
       nixosConfigurations = import ./nixos { inherit inputs outputs; };

@@ -20,11 +20,19 @@
     ];
   };
 
-  "errand-ensemble" = inputs.nixpkgs.lib.nixosSystem {
+  "errand-ensemble-1" = inputs.nixpkgs.lib.nixosSystem {
     specialArgs = { inherit inputs outputs; };
     modules = [
       inputs.home-manager.nixosModules.home-manager
-      ./errand-ensemble
+      ./errand-ensemble-1
+    ];
+  };
+
+  "errand-ensemble-2" = inputs.nixpkgs.lib.nixosSystem {
+    specialArgs = { inherit inputs outputs; };
+    modules = [
+      inputs.home-manager.nixosModules.home-manager
+      ./errand-ensemble-2
     ];
   };
 }
