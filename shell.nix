@@ -16,6 +16,7 @@ pkgs.stdenv.mkDerivation {
   nativeBuildInputs = with pkgs; [
     nil
     git
+    qemu-user
   ];
 
   NIX_CONFIG = "extra-experimental-features = nix-command flakes";
