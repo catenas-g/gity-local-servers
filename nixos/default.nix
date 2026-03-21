@@ -19,4 +19,12 @@
       ./monooki
     ];
   };
+
+  "errand-ensemble" = inputs.nixpkgs.lib.nixosSystem {
+    specialArgs = { inherit inputs outputs; };
+    modules = [
+      inputs.home-manager.nixosModules.home-manager
+      ./errand-ensemble
+    ];
+  };
 }
