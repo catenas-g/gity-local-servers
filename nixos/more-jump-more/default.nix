@@ -14,12 +14,13 @@
     "${modulesPath}/installer/sd-card/sd-image-aarch64.nix"
   ]
   ++ (with outputs.modules.nixos; [
-    headscale
+    # headscale
     caddy-l4
     tailscale
     cloudflare-ddns
     ssh-server
     github-runner
+    openvpn
   ]);
 
   # --- Caddy L4/L7 routing configuration ---

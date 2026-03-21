@@ -7,4 +7,5 @@
   github-runner = import ./github-runner;
   attic = import ./attic;
   attic-watch = import ./attic-watch;
+  openvpn = import ./openvpn;
 }
