@@ -51,8 +51,7 @@
       modules = import ./modules;
 
       # SD card image (cross-compiled from x86_64-linux)
-      # more-jump-more は現在使用停止中（ファイルは保持）
-      # packages.x86_64-linux.sdImage = self.nixosConfigurations.more-jump-more.config.system.build.sdImage;
+      packages.x86_64-linux.sdImage = self.nixosConfigurations.more-jump-more.config.system.build.sdImage;
 
       # NixOS
       nixosConfigurations = import ./nixos { inherit inputs outputs; };

@@ -18,6 +18,7 @@
     tailscale
     cloudflare-ddns
     ssh-server
+    github-runner
   ]);
 
   # --- Caddy L4/L7 routing configuration ---
