@@ -5,4 +5,5 @@
   cloudflare-ddns = import ./cloudflare-ddns;
   ssh-server = import ./ssh-server;
   github-runner = import ./github-runner;
+  attic = import ./attic;
 }

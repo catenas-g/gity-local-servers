@@ -13,6 +13,7 @@
   ++ (with outputs.modules.nixos; [
     # tailscale
     ssh-server
+    attic
   ]);
 
   # --- Boot ---
