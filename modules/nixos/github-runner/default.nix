@@ -33,6 +33,9 @@ in
             "nixos"
             hostname
           ];
+          # Use persistent storage instead of tmpfs (RuntimeDirectory)
+          # to avoid ENOSPC during pnpm install / nix build
+          workDir = "/var/lib/github-runner/${hostname}-${toString i}/work";
           extraPackages = with pkgs; [
             nix
             docker
