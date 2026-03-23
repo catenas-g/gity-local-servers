@@ -35,7 +35,7 @@ in
           ];
           # Use persistent storage instead of tmpfs (RuntimeDirectory)
           # to avoid ENOSPC during pnpm install / nix build
-          workDir = "/var/lib/github-runner/${hostname}-${toString i}/work";
+          workDir = "/var/lib/github-runner-work/${hostname}-${toString i}";
           extraPackages = with pkgs; [
             nix
             docker
@@ -51,7 +51,7 @@ in
             RestrictNamespaces = false;
             StateDirectory = [
               "github-runner/${hostname}-${toString i}"
-              "github-runner/${hostname}-${toString i}/work"
+              "github-runner-work/${hostname}-${toString i}"
             ];
             SupplementaryGroups = [ "docker" ];
             BindPaths = [ "/var/run/docker.sock" ];
