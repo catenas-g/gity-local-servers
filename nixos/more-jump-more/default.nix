@@ -21,6 +21,7 @@
     ssh-server
     github-runner
     openvpn
+    attic-watch
   ]);
 
   # --- Caddy L4/L7 routing configuration ---
