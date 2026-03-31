@@ -16,6 +16,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    tomoru = {
+      url = "git+ssh://git@github.com/catenas-g/tomoru.git";
+    };
   };
 
   outputs =

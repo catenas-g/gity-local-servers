@@ -8,6 +8,7 @@
 {
   imports = [
     ./hardware-configuration.nix
+    ./tomoru.nix
     ../../modules/common/nixpkgs.nix
     ../../modules/common/base.nix
   ]
