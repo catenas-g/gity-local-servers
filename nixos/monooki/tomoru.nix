@@ -4,12 +4,19 @@
 #   http://192.168.128.199:3000  -- Web (public site)
 #   http://192.168.128.199:3001  -- Admin (management dashboard)
 #   http://192.168.128.199:3002  -- Kiosk (in-location display)
-#   http://192.168.128.199:8081  -- API
+#   http://192.168.128.199:8081  -- API (REST)
 #   http://192.168.128.199:8180  -- Keycloak (auth)
 #
-# NOTE: NEXT_PUBLIC_API_BASE_URL is set as a runtime env var for SSR,
-# but client-side JS uses the build-time value. If browser API calls fail,
-# rebuild tomoru packages with: nextPublicApiBaseUrl = "http://192.168.128.199:8081"
+# Keycloak admin console: http://192.168.128.199:8180/admin/
+#   Initial credentials: admin / changeme (set by Keycloak module)
+#
+# TOMORU admin login: admin / changeme (temporary, must change on first login)
+#
+# After deployment:
+#   1. Log into Keycloak admin console and verify the "tomoru" realm was imported
+#   2. Update OIDC_CLIENT_SECRET in /var/lib/secrets/tomoru-api.env to match
+#      the client secret in Keycloak (default: "changeme")
+#   3. Change default passwords
 {
   inputs,
   lib,
@@ -30,8 +37,13 @@ in
     domain = "tomoru.internal";
     acmeEmail = "unused@example.com";
 
+    # Disable SSL for local network HTTP access
+    useSSL = false;
+
+    # --- API ---
     api = {
       port = 8081; # 8080 is used by Attic
+      logLevel = "info";
 
       environmentFile = "/var/lib/secrets/tomoru-api.env";
 
@@ -41,17 +53,44 @@ in
         "http://${monookiIp}:3002"
       ];
 
+      # Session cookies over plain HTTP
+      sessionCookieSecure = false;
+
       oidc = {
         issuerUrl = "http://${monookiIp}:8180/realms/tomoru";
         publicUrl = "http://${monookiIp}:8180/realms/tomoru";
+        clientId = "tomoru-admin";
         redirectUrl = "http://${monookiIp}:8081/api/auth/callback";
       };
     };
 
-    # Point frontends to IP-based API URL
-    web.apiPublicBaseUrl = "http://${monookiIp}:8081";
-    admin.apiPublicBaseUrl = "http://${monookiIp}:8081";
-    kiosk.apiPublicBaseUrl = "http://${monookiIp}:8081";
+    # --- Frontends ---
+    # hostname = IP so redirect_uri uses the correct address (not 0.0.0.0)
+    # apiInternalBaseUrl = direct IP access (no nginx proxy)
+    web = {
+      hostname = monookiIp;
+      apiPublicBaseUrl = "http://${monookiIp}:8081";
+      apiInternalBaseUrl = "http://${monookiIp}:8081";
+    };
+    admin = {
+      hostname = monookiIp;
+      apiPublicBaseUrl = "http://${monookiIp}:8081";
+      apiInternalBaseUrl = "http://${monookiIp}:8081";
+    };
+    kiosk = {
+      hostname = monookiIp;
+      apiPublicBaseUrl = "http://${monookiIp}:8081";
+      apiInternalBaseUrl = "http://${monookiIp}:8081";
+    };
+
+    # --- Keycloak ---
+    keycloak = {
+      port = 8180;
+      realmFile = ./keycloak-tomoru-realm.json;
+    };
+
+    # --- nginx ---
+    nginx.sslMode = "none";
   };
 
   # --- Overrides for IP-based local deployment ---
