@@ -26,7 +26,7 @@ in
       home = "/var/lib/github-runner";
       createHome = true;
     };
-    users.groups.${runnerGroup} = {};
+    users.groups.${runnerGroup} = { };
 
     services.github-runners = lib.listToAttrs (
       map (i: {
