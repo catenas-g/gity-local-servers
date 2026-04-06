@@ -308,11 +308,11 @@
         "treefmt-nix": "treefmt-nix_2"
       },
       "locked": {
-        "lastModified": 1775490396,
-        "narHash": "sha256-zE7ZBVSCGoD+MGJZhoxvgO59YNbJCXGg5o6GmRkNBNg=",
+        "lastModified": 1775490843,
+        "narHash": "sha256-uzYTJs5nOkkvXSkSkJajnf6Zk3nXIh1mY3ZhbfQgo1Q=",
         "ref": "refs/heads/main",
-        "rev": "e2cded83623931ce3497118b77120266a4b7b78b",
-        "revCount": 344,
+        "rev": "4cb639ff14bef883ced742dee873811e24691cc4",
+        "revCount": 345,
         "type": "git",
         "url": "ssh://git@github.com/catenas-g/tomoru.git"
       },
