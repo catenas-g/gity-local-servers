@@ -94,6 +94,7 @@ in
       http-port = 8180;
       proxy-headers = "xforwarded";
       http-enabled = true;
+      health-enabled = true;
     };
 
     database = {
@@ -138,7 +139,7 @@ in
       # Wait for Keycloak to become ready
       echo "Waiting for Keycloak..."
       elapsed=0
-      while ! curl -sf http://127.0.0.1:8180/health/ready > /dev/null 2>&1; do
+      while ! curl -sf http://127.0.0.1:8180/realms/master > /dev/null 2>&1; do
         if [ "$elapsed" -ge 120 ]; then
           echo "ERROR: Keycloak did not become ready within 120s" >&2
           exit 1
