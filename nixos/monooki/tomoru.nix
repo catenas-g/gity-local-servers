@@ -88,14 +88,12 @@ in
     enable = true;
     initialAdminPassword = "changeme"; # Change via admin console after first login
 
-    # mkForce needed: old tomoru module's keycloak.nix also sets these.
-    # Remove mkForce after deploying the updated tomoru module.
     settings = {
-      hostname = lib.mkForce "http://${monookiIp}:8180";
-      http-host = lib.mkForce "0.0.0.0";
-      http-port = lib.mkForce 8180;
-      proxy-headers = lib.mkForce "xforwarded";
-      http-enabled = lib.mkForce true;
+      hostname = "http://${monookiIp}:8180";
+      http-host = "0.0.0.0";
+      http-port = 8180;
+      proxy-headers = "xforwarded";
+      http-enabled = true;
     };
 
     database = {
