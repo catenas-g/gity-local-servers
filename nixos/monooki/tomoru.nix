@@ -5,20 +5,14 @@
 #   http://192.168.128.199:3001  -- Admin (management dashboard)
 #   http://192.168.128.199:3002  -- Kiosk (in-location display)
 #   http://192.168.128.199:8081  -- API (REST)
-#   http://192.168.128.199:8180  -- Keycloak (auth)
+#   http://192.168.128.199:8180  -- Keycloak (auth, managed separately)
 #
 # Keycloak admin console: http://192.168.128.199:8180/admin/
+#   Initial credentials: admin / changeme (change after first login)
 #
-# Secrets (auto-generated on first boot, stored outside git):
-#   /var/lib/secrets/tomoru-keycloak-admin.env   -- KC_BOOTSTRAP_ADMIN_PASSWORD (Keycloak admin)
+# Secrets (stored outside git in /var/lib/secrets/):
+#   /var/lib/secrets/tomoru-api.env              -- SESSION_ENCRYPTION_KEY + OIDC_CLIENT_SECRET
 #   /var/lib/secrets/tomoru-keycloak-db-pass     -- Keycloak DB password
-#   /var/lib/secrets/tomoru-api.env       -- SESSION_ENCRYPTION_KEY + OIDC_CLIENT_SECRET
-#
-# To change the Keycloak admin password:
-#   1. Edit /var/lib/secrets/tomoru-keycloak-admin.env
-#   2. Restart keycloak.service
-#
-# OIDC_CLIENT_SECRET is fetched automatically from Keycloak API on first boot.
 {
   inputs,
   lib,
@@ -27,6 +21,7 @@
 }:
 let
   monookiIp = "192.168.128.199";
+  realmFile = ./keycloak-tomoru-realm.json;
 in
 {
   imports = [ inputs.tomoru.nixosModules.default ];
@@ -42,12 +37,8 @@ in
     # Disable SSL for local network HTTP access
     useSSL = false;
 
-    # --- Secrets auto-generation (via tomoru secrets module) ---
-    secrets = {
-      autoGenerate = true;
-      fetchOidcSecret = true;
-      oidc.keycloakBaseUrl = "http://${monookiIp}:8180";
-    };
+    # --- Secrets ---
+    secrets.autoGenerate = true;
 
     # --- API ---
     api = {
@@ -72,8 +63,6 @@ in
     };
 
     # --- Frontends ---
-    # hostname = IP so redirect_uri uses the correct address (not 0.0.0.0)
-    # apiInternalBaseUrl = direct IP access (no nginx proxy)
     web = {
       hostname = monookiIp;
       apiPublicBaseUrl = "http://${monookiIp}:8081";
@@ -90,27 +79,186 @@ in
       apiInternalBaseUrl = "http://${monookiIp}:8081";
     };
 
-    # --- Keycloak ---
-    keycloak = {
-      port = 8180;
-      realmFile = ./keycloak-tomoru-realm.json;
-    };
-
     # --- nginx ---
     nginx.sslMode = "none";
+  };
+
+  # --- Keycloak (managed independently of TOMORU module) ---
+  services.keycloak = {
+    enable = true;
+    initialAdminPassword = "changeme"; # Change via admin console after first login
+
+    # mkForce needed: old tomoru module's keycloak.nix also sets these.
+    # Remove mkForce after deploying the updated tomoru module.
+    settings = {
+      hostname = lib.mkForce "http://${monookiIp}:8180";
+      http-host = lib.mkForce "0.0.0.0";
+      http-port = lib.mkForce 8180;
+      proxy-headers = lib.mkForce "xforwarded";
+      http-enabled = lib.mkForce true;
+    };
+
+    database = {
+      type = "postgresql";
+      createLocally = true;
+      passwordFile = "/var/lib/secrets/tomoru-keycloak-db-pass";
+    };
+  };
+
+  # Auto-generate Keycloak DB password on first boot
+  system.activationScripts.keycloak-secrets = ''
+    mkdir -p /var/lib/secrets
+
+    if [ ! -f /var/lib/secrets/tomoru-keycloak-db-pass ]; then
+      ${pkgs.openssl}/bin/openssl rand -base64 32 | tr -d '\n' \
+        > /var/lib/secrets/tomoru-keycloak-db-pass
+      chmod 600 /var/lib/secrets/tomoru-keycloak-db-pass
+      echo "[keycloak-secrets] Generated tomoru-keycloak-db-pass"
+    fi
+  '';
+
+  # --- Keycloak realm import (runs once after Keycloak starts) ---
+  systemd.services.keycloak-import-realm = {
+    description = "Import TOMORU realm into Keycloak";
+    after = [ "keycloak.service" ];
+    wantedBy = [ "multi-user.target" ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+
+    path = with pkgs; [
+      curl
+      jq
+      coreutils
+    ];
+
+    script = ''
+      set -euo pipefail
+
+      # Wait for Keycloak to become ready
+      echo "Waiting for Keycloak..."
+      elapsed=0
+      while ! curl -sf http://127.0.0.1:8180/health/ready > /dev/null 2>&1; do
+        if [ "$elapsed" -ge 120 ]; then
+          echo "ERROR: Keycloak did not become ready within 120s" >&2
+          exit 1
+        fi
+        sleep 2
+        elapsed=$((elapsed + 2))
+      done
+      echo "Keycloak is ready"
+
+      # Check if realm already exists
+      if curl -sf http://127.0.0.1:8180/realms/tomoru > /dev/null 2>&1; then
+        echo "Realm 'tomoru' already exists, skipping import"
+        exit 0
+      fi
+
+      # Get admin token
+      TOKEN=$(curl -sf -X POST "http://127.0.0.1:8180/realms/master/protocol/openid-connect/token" \
+        -d "grant_type=password" \
+        -d "client_id=admin-cli" \
+        -d "username=admin" \
+        --data-urlencode "password=changeme" \
+        | jq -r '.access_token')
+
+      if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+        echo "ERROR: Failed to get admin token. If the admin password was changed, import the realm manually." >&2
+        exit 1
+      fi
+
+      # Import realm
+      HTTP_CODE=$(curl -s -o /dev/null -w '%{http_code}' -X POST "http://127.0.0.1:8180/admin/realms" \
+        -H "Authorization: Bearer $TOKEN" \
+        -H "Content-Type: application/json" \
+        -d @${realmFile})
+
+      if [ "$HTTP_CODE" = "201" ]; then
+        echo "Realm 'tomoru' imported successfully"
+      else
+        echo "ERROR: Realm import failed with HTTP $HTTP_CODE" >&2
+        exit 1
+      fi
+    '';
+  };
+
+  # --- OIDC client secret fetch (runs after realm import) ---
+  # Fetches the client secret from Keycloak and writes it to tomoru-api.env
+  systemd.services.tomoru-fetch-oidc-secret = {
+    description = "Fetch TOMORU OIDC client secret from Keycloak";
+    after = [ "keycloak-import-realm.service" ];
+    requires = [ "keycloak-import-realm.service" ];
+    before = [ "tomoru-api.service" ];
+    requiredBy = [ "tomoru-api.service" ];
+
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+
+    path = with pkgs; [
+      curl
+      jq
+      coreutils
+      gnugrep
+    ];
+
+    script = ''
+      set -euo pipefail
+
+      ENV_FILE="/var/lib/secrets/tomoru-api.env"
+
+      # Skip if OIDC_CLIENT_SECRET is already present
+      if grep -q '^OIDC_CLIENT_SECRET=' "$ENV_FILE" 2>/dev/null; then
+        echo "OIDC_CLIENT_SECRET already present, skipping"
+        exit 0
+      fi
+
+      # Get admin token
+      TOKEN=$(curl -sf -X POST "http://127.0.0.1:8180/realms/master/protocol/openid-connect/token" \
+        -d "grant_type=password" \
+        -d "client_id=admin-cli" \
+        -d "username=admin" \
+        --data-urlencode "password=changeme" \
+        | jq -r '.access_token')
+
+      if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+        echo "ERROR: Failed to get admin token" >&2
+        exit 1
+      fi
+
+      # Get client UUID
+      CLIENT_UUID=$(curl -sf -H "Authorization: Bearer $TOKEN" \
+        "http://127.0.0.1:8180/admin/realms/tomoru/clients?clientId=tomoru-admin" \
+        | jq -r '.[0].id')
+
+      if [ -z "$CLIENT_UUID" ] || [ "$CLIENT_UUID" = "null" ]; then
+        echo "ERROR: Client 'tomoru-admin' not found" >&2
+        exit 1
+      fi
+
+      # Get client secret
+      CLIENT_SECRET=$(curl -sf -H "Authorization: Bearer $TOKEN" \
+        "http://127.0.0.1:8180/admin/realms/tomoru/clients/$CLIENT_UUID/client-secret" \
+        | jq -r '.value')
+
+      if [ -z "$CLIENT_SECRET" ] || [ "$CLIENT_SECRET" = "null" ]; then
+        echo "ERROR: Failed to retrieve client secret" >&2
+        exit 1
+      fi
+
+      # Append to env file
+      printf 'OIDC_CLIENT_SECRET=%s\n' "$CLIENT_SECRET" >> "$ENV_FILE"
+      echo "OIDC_CLIENT_SECRET written successfully"
+    '';
   };
 
   # --- Overrides for IP-based local deployment ---
 
   # Session cookie domain must match how users access the site
   systemd.services.tomoru-api.environment.SESSION_COOKIE_DOMAIN = lib.mkForce monookiIp;
-
-  # Keycloak: listen on all interfaces and use IP-based hostname
-  # (module defaults to 127.0.0.1 assuming nginx proxy)
-  services.keycloak.settings = {
-    hostname = lib.mkForce "http://${monookiIp}:8180";
-    http-host = lib.mkForce "0.0.0.0";
-  };
 
   # Disable ACME/SSL on all tomoru nginx virtual hosts (local network, no TLS needed)
   services.nginx.virtualHosts = {
@@ -127,10 +275,6 @@ in
       forceSSL = lib.mkForce false;
     };
     "api.tomoru.internal" = {
-      enableACME = lib.mkForce false;
-      forceSSL = lib.mkForce false;
-    };
-    "auth.tomoru.internal" = {
       enableACME = lib.mkForce false;
       forceSSL = lib.mkForce false;
     };

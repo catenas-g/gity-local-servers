@@ -24,6 +24,7 @@ more-jump-more (Raspberry Pi 4 / 192.168.128.200)
 
 monooki (x86_64 / 192.168.128.199)
   ├─ NextCloud 31      … ファイルサーバー
+  ├─ TOMORU            … 店舗管理アプリ (API + Web + Admin + Kiosk + Keycloak)
   ├─ Attic             … Nix バイナリキャッシュ
   └─ GitHub Runner ×4  … CI/CD (並列実行)
 
@@ -70,7 +71,9 @@ errand-ensemble-2 (Raspberry Pi 4 / 192.168.128.197)
 │   └── github-runner/            # Docker Compose ランナー (非 NixOS 向け)
 ├── scripts/
 │   ├── setup-github-runner.sh    # ランナートークンデプロイ
-│   └── setup-attic-watch.sh      # Attic トークンデプロイ
+│   ├── setup-attic-watch.sh      # Attic トークンデプロイ
+│   ├── setup-openvpn.sh          # OpenVPN PKI・クライアント管理
+│   └── setup-tomoru.sh           # TOMORU シークレット設置・管理
 └── docs/                         # ガイド・トラブルシューティング
 ```
 
