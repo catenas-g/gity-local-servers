@@ -20,9 +20,12 @@
   boot.kernelModules = [ ];
   boot.extraModulePackages = [ ];
 
+  boot.growPartition = true;
+
   fileSystems."/" = {
     device = lib.mkDefault "/dev/disk/by-uuid/00000000-0000-0000-0000-000000000000";
     fsType = "ext4";
+    autoResize = true;
   };
 
   swapDevices = [ ];
