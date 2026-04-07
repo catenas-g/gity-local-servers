@@ -54,6 +54,24 @@ in
             jq
             gnutar
             gzip
+            unzip
+            zip
+            wget
+            gnused
+            gnugrep
+            gawk
+            findutils
+            coreutils
+            xz
+            bzip2
+            file
+            which
+            openssh
+            rsync
+            patch
+            diffutils
+            gnupg
+            cacert
           ];
           serviceOverrides = {
             PrivateDevices = false;
