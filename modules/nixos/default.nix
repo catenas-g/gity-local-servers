@@ -6,6 +6,7 @@
   ssh-server = import ./ssh-server;
   github-runner = import ./github-runner;
   github-runner-docker = import ./github-runner-docker;
+  github-runner-cleanup = import ./github-runner-cleanup;
   fireactions = import ./fireactions;
   attic = import ./attic;
   attic-watch = import ./attic-watch;

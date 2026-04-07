@@ -24,6 +24,7 @@ let
           LABELS: "${lib.concatStringsSep "," cfg.labels}"
           RUNNER_NAME_PREFIX: "${hostname}"
           EPHEMERAL: "true"
+          DISABLE_AUTO_UPDATE: "true"
           START_DOCKER_SERVICE: "true"
           RUNNER_WORKDIR: "${workDir}"
         env_file:
@@ -104,6 +105,36 @@ in
 
         ExecStart = "${pkgs.docker}/bin/docker compose up -d --build --remove-orphans";
         ExecStop = "${pkgs.docker}/bin/docker compose down";
+
+        # Clean up offline runners from GitHub after stopping containers
+        ExecStopPost = pkgs.writeShellScript "github-runner-docker-cleanup" ''
+          PAT=$(cat ${cfg.tokenFile})
+          ORG="${cfg.orgName}"
+          PREFIX="${hostname}"
+
+          page=1
+          while true; do
+            response=$(${pkgs.curl}/bin/curl -s \
+              -H "Authorization: token $PAT" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/orgs/$ORG/actions/runners?per_page=100&page=$page")
+
+            ids=$(echo "$response" | ${pkgs.jq}/bin/jq -r \
+              --arg prefix "$PREFIX" \
+              '.runners[] | select(.status == "offline" and (.name | startswith($prefix))) | .id' 2>/dev/null)
+
+            [ -z "$ids" ] && break
+
+            for id in $ids; do
+              ${pkgs.curl}/bin/curl -s -X DELETE \
+                -H "Authorization: token $PAT" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/orgs/$ORG/actions/runners/$id" || true
+            done
+
+            page=$((page + 1))
+          done
+        '';
       };
     };
   };

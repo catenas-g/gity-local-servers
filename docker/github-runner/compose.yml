@@ -8,6 +8,7 @@ services:
       LABELS: self-hosted,ubuntu
       RUNNER_NAME_PREFIX: docker-runner
       EPHEMERAL: "true"
+      DISABLE_AUTO_UPDATE: "true"
       START_DOCKER_SERVICE: "true"
       RUNNER_WORKDIR: /tmp/github-runner
     env_file:
@@ -16,3 +17,45 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     deploy:
       replicas: 4
+
+  cleanup:
+    image: alpine:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+    entrypoint: /bin/sh
+    command:
+      - -c
+      - |
+        apk add --no-cache curl jq > /dev/null 2>&1
+        ORG="catenas-g"
+        INTERVAL=3600
+        while true; do
+          echo "[$(date)] Starting offline runner cleanup..."
+          page=1
+          deleted=0
+          while true; do
+            response=$$(curl -s \
+              -H "Authorization: token $${ACCESS_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              "https://api.github.com/orgs/$${ORG}/actions/runners?per_page=100&page=$${page}")
+            ids=$$(echo "$$response" | jq -r '.runners[] | select(.status == "offline") | .id' 2>/dev/null)
+            if [ -z "$$ids" ]; then
+              fetched=$$(echo "$$response" | jq -r '.runners | length' 2>/dev/null)
+              [ "$$fetched" = "0" ] || [ "$$fetched" = "null" ] && break
+              page=$$((page + 1))
+              continue
+            fi
+            for id in $$ids; do
+              echo "Deleting offline runner: $$id"
+              curl -s -X DELETE \
+                -H "Authorization: token $${ACCESS_TOKEN}" \
+                -H "Accept: application/vnd.github+json" \
+                "https://api.github.com/orgs/$${ORG}/actions/runners/$${id}" || true
+              deleted=$$((deleted + 1))
+            done
+            page=$$((page + 1))
+          done
+          echo "[$(date)] Cleanup complete. Deleted $$deleted offline runner(s)."
+          sleep $$INTERVAL
+        done

@@ -17,12 +17,18 @@
     ssh-server
     attic
     github-runner-docker
+    github-runner-cleanup
   ]);
 
   # --- GitHub Actions Runner (Docker-based) ---
   custom.github-runner-docker = {
     enable = true;
     count = 4;
+  };
+
+  # --- GitHub Runner Cleanup (remove offline runners hourly) ---
+  custom.github-runner-cleanup = {
+    enable = true;
   };
 
   # --- Boot ---
