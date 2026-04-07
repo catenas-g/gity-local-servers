@@ -16,11 +16,14 @@
     # tailscale
     ssh-server
     attic
-    github-runner
+    github-runner-docker
   ]);
 
-  # --- GitHub Actions Runner ---
-  custom.github-runner.count = 4;
+  # --- GitHub Actions Runner (Docker-based) ---
+  custom.github-runner-docker = {
+    enable = true;
+    count = 4;
+  };
 
   # --- Boot ---
   boot.initrd.supportedFilesystems = [ "btrfs" ];
