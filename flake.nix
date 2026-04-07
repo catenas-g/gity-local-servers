@@ -67,6 +67,7 @@
           (inputs.nixos-raspberrypi.lib.nixosInstaller {
             specialArgs = { inherit inputs outputs; };
             modules = [
+              { nixpkgs.buildPlatform = "x86_64-linux"; }
               inputs.home-manager.nixosModules.home-manager
               ./nixos/marshall-maximizer
             ];
