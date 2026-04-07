@@ -9,4 +9,10 @@
       };
     };
   };
+
+  # Custom packages
+  custom-packages = final: _prev: {
+    fireactions = final.callPackage ../packages/fireactions { };
+    tc-redirect-tap = final.callPackage ../packages/tc-redirect-tap { };
+  };
 }
