@@ -20,6 +20,10 @@
     tomoru = {
       url = "git+ssh://git@github.com/catenas-g/tomoru.git";
     };
+
+    nixos-raspberrypi = {
+      url = "github:nvmd/nixos-raspberrypi/main";
+    };
   };
 
   outputs =
@@ -54,11 +58,19 @@
       # Modules
       modules = import ./modules;
 
-      # SD card images
+      # SD card / disk images
       packages = forAllSystems (_system: {
         more-jump-more-sdImage = self.nixosConfigurations.more-jump-more.config.system.build.sdImage;
         errand-ensemble-1-sdImage = self.nixosConfigurations.errand-ensemble-1.config.system.build.sdImage;
         errand-ensemble-2-sdImage = self.nixosConfigurations.errand-ensemble-2.config.system.build.sdImage;
+        marshall-maximizer-sdImage =
+          (inputs.nixos-raspberrypi.lib.nixosInstaller {
+            specialArgs = { inherit inputs outputs; };
+            modules = [
+              inputs.home-manager.nixosModules.home-manager
+              ./nixos/marshall-maximizer
+            ];
+          }).config.system.build.sdImage;
       });
 
       # NixOS

@@ -35,4 +35,12 @@
       ./errand-ensemble-2
     ];
   };
+
+  "marshall-maximizer" = inputs.nixos-raspberrypi.lib.nixosSystem {
+    specialArgs = { inherit inputs outputs; };
+    modules = [
+      inputs.home-manager.nixosModules.home-manager
+      ./marshall-maximizer
+    ];
+  };
 }

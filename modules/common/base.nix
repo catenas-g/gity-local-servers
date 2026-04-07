@@ -58,10 +58,12 @@
     substituters = [
       "https://cache.nixos.org"
       "http://192.168.128.199:8080/gity"
+      "https://nixos-raspberrypi.cachix.org"
     ];
     trusted-public-keys = [
       "cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY="
       "gity:XeiT0KGhWFIQM9GxOGSa60X8axF0cSJBd92/DaIbXXY="
+      "nixos-raspberrypi.cachix.org-1:4iMO9LXa8BqhU+Rpg6LQKiGa2lsNh/j2oiYLNOQ5sPI="
     ];
   };
 
