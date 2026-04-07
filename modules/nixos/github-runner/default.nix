@@ -72,10 +72,12 @@ in
             diffutils
             gnupg
             cacert
+            bun
           ];
           serviceOverrides = {
             PrivateDevices = false;
             PrivateUsers = false;
+            ProtectProc = "default";
             RestrictNamespaces = false;
             SupplementaryGroups = [ "docker" ];
             BindPaths = [ "/var/run/docker.sock" ];
