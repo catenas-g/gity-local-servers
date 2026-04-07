@@ -5,6 +5,8 @@
   cloudflare-ddns = import ./cloudflare-ddns;
   ssh-server = import ./ssh-server;
   github-runner = import ./github-runner;
+  github-runner-docker = import ./github-runner-docker;
+  fireactions = import ./fireactions;
   attic = import ./attic;
   attic-watch = import ./attic-watch;
   openvpn = import ./openvpn;
