@@ -31,7 +31,6 @@ let
           - .env
         volumes:
           - /var/run/docker.sock:/var/run/docker.sock
-          - ${workDir}:${workDir}
         deploy:
           replicas: ${toString cfg.count}
   '';
@@ -73,7 +72,6 @@ in
 
     systemd.tmpfiles.rules = [
       "d ${projectDir} 0750 root root -"
-      "d ${workDir} 0777 root root -"
     ];
 
     systemd.services.github-runner-docker = {
