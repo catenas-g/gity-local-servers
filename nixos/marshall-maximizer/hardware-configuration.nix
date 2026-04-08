@@ -1,5 +1,4 @@
 # Hardware configuration for marshall-maximizer (Raspberry Pi 5)
-# TODO: Update the root filesystem UUID after first boot
 {
   lib,
   modulesPath,
@@ -23,7 +22,7 @@
   boot.growPartition = true;
 
   fileSystems."/" = {
-    device = lib.mkDefault "/dev/disk/by-uuid/00000000-0000-0000-0000-000000000000";
+    device = lib.mkForce "/dev/disk/by-uuid/e5525414-3d27-45d3-99f5-ec56750ce6ac";
     fsType = "ext4";
     autoResize = true;
   };

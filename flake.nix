@@ -64,10 +64,11 @@
         errand-ensemble-1-sdImage = self.nixosConfigurations.errand-ensemble-1.config.system.build.sdImage;
         errand-ensemble-2-sdImage = self.nixosConfigurations.errand-ensemble-2.config.system.build.sdImage;
         marshall-maximizer-sdImage =
-          (inputs.nixos-raspberrypi.lib.nixosInstaller {
+          (inputs.nixos-raspberrypi.lib.nixosSystem {
             specialArgs = { inherit inputs outputs; };
             modules = [
               { nixpkgs.buildPlatform = "x86_64-linux"; }
+              inputs.nixos-raspberrypi.nixosModules.sd-image
               inputs.home-manager.nixosModules.home-manager
               ./nixos/marshall-maximizer
             ];

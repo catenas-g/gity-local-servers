@@ -16,6 +16,8 @@
   ])
   ++ (with outputs.modules.nixos; [
     ssh-server
+    github-runner-docker
+    github-runner-cleanup
   ]);
 
   # --- Boot ---
@@ -38,6 +40,17 @@
         dns = "192.168.128.1";
       };
     };
+  };
+
+  # --- GitHub Actions Runner (Docker-based) ---
+  custom.github-runner-docker = {
+    enable = true;
+    count = 2;
+  };
+
+  # --- GitHub Runner Cleanup (remove offline runners hourly) ---
+  custom.github-runner-cleanup = {
+    enable = true;
   };
 
   # --- User (SSH keys) ---
